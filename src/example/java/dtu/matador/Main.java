@@ -2,19 +2,18 @@ package dtu.matador;
 
 import dtu.boardengine.*;
 
-import javax.swing.*;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class Main extends GameController {
-    private final List<Integer> hotelCount;
+    private final List<Integer> houseCount;
 
     public Main() {
-        hotelCount = new ArrayList<>();
+        houseCount = new ArrayList<>();
         for (int i = 0; i < 24; i++) {
-            hotelCount.add(0);
+            houseCount.add(0);
         }
 
     }
@@ -22,7 +21,7 @@ public class Main extends GameController {
     public Board.Factory setup() {
         Board.Factory bf = Board.make();
 
-        for (Integer _i : hotelCount) {
+        for (Integer ignored : houseCount) {
             bf.addField(Field.make()
                           .setTitle("Field")
                           .setSubtitle("")
@@ -37,23 +36,29 @@ public class Main extends GameController {
     public void draw(Board board) {
         board.clear();
         Token hotel = Token.from("Hotel.png");
-        for (int i = 0; i < hotelCount.size(); i++) {
+        Token house = Token.from("House.png");
+        for (int i = 0; i < houseCount.size(); i++) {
             ArrayList<Token> tokens = new ArrayList<>();
-            for (int j = 0; j < hotelCount.get(i); j++) {
-                tokens.add(hotel);
+            int j = houseCount.get(i);
+            while (j > 0) {
+                if (j >= 5) {
+                    j -= 5;
+                    tokens.add(hotel);
+                } else {
+                    j -= 1;
+                    tokens.add(house);
+                }
             }
+            System.out.println(i +  ": " + tokens.size());
             board.setFieldTokens(i, tokens);
         }
     }
 
     @Override
     public void clickField(Field field) {
-        System.out.println("Printed: " + field);
         var fid = field.getId();
-        hotelCount.set(fid, hotelCount.get(fid) + 1);
-        SwingUtilities.invokeLater(() -> {
-            this.draw(field.getBoard());
-        });
+        System.out.println(houseCount.get(fid));
+        houseCount.set(fid, (houseCount.get(fid) + 1));
     }
 
 

@@ -6,8 +6,6 @@ import dtu.boardengine.util.ClickListener;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,14 +15,15 @@ import java.util.List;
 public class Board {
     private final List<Field> fields;
 
-    // private final BoardCenter center;
-    private final JFrame frame;
+    private final GameController controller;
 
 
-    private Board(Factory factory) {
+    private Board(Factory factory, GameController controller) {
         // this.center = factory.center;
+        this.controller = controller;
 
-        this.frame = new JFrame();
+        // private final BoardCenter center;
+        JFrame frame = new JFrame();
         frame.setLocationByPlatform(true);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -38,7 +37,7 @@ public class Board {
 
         var tmpFields = new ArrayList<Field>();
         var panes = new ArrayList<JComponent>();
-        for (Field.Factory f : factory.fields) {
+        for (Field.Factory ignored : factory.fields) {
             var pane = new JLayeredPane();
             pane.setOpaque(true);
             base.add(pane);
@@ -53,7 +52,8 @@ public class Board {
             p.addMouseListener(new ClickListener() {
                 @Override
                 public void onClick() {
-                    factory.eventHandler.clickField(field);
+                    controller.clickField(field);
+                    redraw();
                 }
             });
         }
@@ -64,13 +64,17 @@ public class Board {
         this.fields = List.copyOf(tmpFields);
     }
 
+    private void redraw() {
+        SwingUtilities.invokeLater(() -> controller.draw(this));
+    }
+
 
     public static Factory make(Attributes attributes) {
         return new Factory(attributes);
     }
 
     public static Factory make() {
-        return new Factory(Attributes.def());
+        return make(Attributes.def());
     }
 
     public void setFieldTokens(int i, List<Token> tokens) {
@@ -83,6 +87,7 @@ public class Board {
         }
     }
 
+    @SuppressWarnings({"UnusedReturnValue", "unused"})
     public static class Factory {
         private final Attributes attrs;
 
@@ -91,9 +96,9 @@ public class Board {
 
         private Color background;
         private ArrayList<Field.Factory> fields = new ArrayList<>();
-        private BoardCenter center;
+        // private BoardCenter center;
         private BoardLayout layout = new EdgeLayout();
-        private EventHandler eventHandler;
+        private GameController controller;
 
         public Factory(Attributes attrs) {
             this.attrs = attrs;
@@ -101,51 +106,34 @@ public class Board {
             background = attrs.getBoardColor();
         }
 
+
         public Factory addField(Field.Factory field) {
             fields.add(field);
             return this;
         }
 
-        @SuppressWarnings("unused")
         private Factory setFields(ArrayList<Field.Factory> fields) {
             this.fields = fields;
             return this;
         }
 
-        @SuppressWarnings("unused")
         public Factory setDimensions(Dimension dimensions) {
             this.dimensions = dimensions;
             return this;
         }
 
-        @SuppressWarnings("unused")
         public Factory setBackground(Color background) {
             this.background = background;
             return this;
         }
 
-        @SuppressWarnings("unused")
-        private Factory setCenter(BoardCenter center) {
-            this.center = center;
-            return this;
-        }
-
-        @SuppressWarnings("unused")
         private Factory setLayout(BoardLayout layout) {
             this.layout = layout;
             return this;
         }
 
-        public Board done() {
-            return new Board(this);
-        }
-
-        public void setEventHandler(EventHandler eventHandler) {
-            this.eventHandler = eventHandler;
-        }
-
-        public EventHandler getEventHandler() {
-            return eventHandler;
+        public Board done(GameController controller) {
+            return new Board(this, controller);
         }
     }
 

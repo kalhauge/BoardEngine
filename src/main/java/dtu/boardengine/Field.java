@@ -7,16 +7,15 @@ import java.util.List;
 /**
  * A field is something which you can put tokens on.
  */
+@SuppressWarnings("unused")
 public class Field {
     private final Board board;
     private final int id;
-    private final JLayeredPane pane;
     private final JLayeredPane tokens;
 
     private Field(Factory factory, Board board, int id, JLayeredPane pane) {
         this.board = board;
         this.id = id;
-        this.pane = pane;
         pane.setLayout(null);
         pane.setBackground(factory.background);
         pane.setOpaque(true);
@@ -31,8 +30,13 @@ public class Field {
 
         this.tokens = new JLayeredPane();
         pane.add(tokens);
-        tokens.setLayout(new GridBagLayout());
-        tokens.setBounds(0, 0, pane.getWidth(), pane.getHeight());
+        this.tokens.setLayout(new GridLayout(3, 3));
+        this.tokens.setBounds(
+          factory.tokenMargin,
+          factory.tokenMargin,
+          pane.getWidth() - factory.tokenMargin * 2,
+          pane.getHeight() - factory.tokenMargin * 2
+        );
         pane.setLayer(this.tokens, JLayeredPane.PALETTE_LAYER);
 
     }
@@ -50,6 +54,11 @@ public class Field {
         return new Factory();
     }
 
+    /**
+     * Updates the tokens on the field. This will actively also redraw the field.
+     *
+     * @param tokens a list of tokens to draw
+     */
     public void setTokens(List<Token> tokens) {
         this.tokens.removeAll();
         for (Token t : tokens) {
@@ -58,10 +67,13 @@ public class Field {
             this.tokens.add(label);
         }
         this.tokens.revalidate();
+        this.tokens.repaint();
     }
 
+    @SuppressWarnings("unused")
     public static class Factory {
         public Color foreground = Color.black;
+        public int tokenMargin = 20;
         private Color background = Color.white;
         private String title = "Title";
         private String subtitle = "Subtitle";
@@ -90,7 +102,12 @@ public class Field {
             return this;
         }
 
-        private JLabel makeLabel(String string)  {
+        public Factory setTokenMargin(int tokenMargin) {
+            this.tokenMargin = tokenMargin;
+            return this;
+        }
+
+        private JLabel makeLabel(String string) {
             var label = new JLabel();
             label.setText(string);
             label.setForeground(foreground);

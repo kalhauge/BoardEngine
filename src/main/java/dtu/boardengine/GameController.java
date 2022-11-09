@@ -12,8 +12,7 @@ public abstract class GameController implements EventHandler {
         // Needed to make the swing application perform correctly
         SwingUtilities.invokeLater(() -> {
             Board.Factory bf = setup();
-            bf.setEventHandler(this);
-            Board board = bf.done();
+            Board board = bf.done(this);
             draw(board);
         });
     }

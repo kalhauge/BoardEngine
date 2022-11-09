@@ -61,6 +61,14 @@ public class Main extends GameController {
         houseCount.set(fid, (houseCount.get(fid) + 1));
     }
 
+    public void clickInfoBox(Board board) {
+        // reset house count
+        for (int i = 0; i < houseCount.size(); i++) {
+            houseCount.set(i, 0);
+        }
+        board.displayDies(List.of(1, 3));
+    }
+
 
     public static void main(String[] args) {
         new Main().runGame();

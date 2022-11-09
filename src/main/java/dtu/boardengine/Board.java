@@ -6,8 +6,10 @@ import dtu.boardengine.util.ClickListener;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  *
@@ -16,11 +18,15 @@ public class Board {
     private final List<Field> fields;
 
     private final GameController controller;
+    private final Die.Factory dieFactory;
+    private final JLayeredPane diebox;
 
 
     private Board(Factory factory, GameController controller) {
         // this.center = factory.center;
         this.controller = controller;
+
+        this.dieFactory = factory.dieFactory;
 
         // private final BoardCenter center;
         JFrame frame = new JFrame();
@@ -29,12 +35,47 @@ public class Board {
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         var base = new JLayeredPane();
-        var dimensions = factory.attrs.getWindowDimensions();
-        base.setPreferredSize(dimensions);
+        base.setPreferredSize(factory.dimensions);
         base.setLayout(null);
-        base.setBackground(factory.attrs.getBoardColor());
+        base.setBackground(factory.background);
         base.setOpaque(true);
+        frame.add(base);
 
+        var infobox = new JLayeredPane();
+        infobox.setOpaque(true);
+        infobox.setBackground(Color.green);
+
+        var board = this;
+        infobox.addMouseListener(new ClickListener() {
+            @Override
+            public void onClick() {
+                controller.clickInfoBox(board);
+                redraw();
+            }
+        });
+        base.add(infobox);
+
+        diebox = new JLayeredPane();
+        diebox.setOpaque(true);
+        diebox.setLayout(null);
+        diebox.setBackground(Color.blue);
+        base.add(diebox);
+        base.setLayer(diebox, JLayeredPane.PALETTE_LAYER);
+        diebox.addMouseListener(new ClickListener() {
+            @Override
+            public void onClick() {
+                controller.clickInfoBox(board);
+                redraw();
+            }
+        });
+
+        this.fields = setupFields(factory, diebox, base);
+
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    private ArrayList<Field> setupFields (Factory factory, JLayeredPane infobox, JLayeredPane base) {
         var tmpFields = new ArrayList<Field>();
         var panes = new ArrayList<JComponent>();
         for (Field.Factory ignored : factory.fields) {
@@ -43,7 +84,9 @@ public class Board {
             base.add(pane);
             panes.add(pane);
         }
-        factory.layout.layoutFields(panes, dimensions);
+
+        factory.layout.layoutBoard(panes, infobox, factory.dimensions);
+
         for (int i = 0; i < factory.fields.size(); i ++ ) {
             var f = factory.fields.get(i);
             var p = (JLayeredPane) panes.get(i);
@@ -57,24 +100,42 @@ public class Board {
                 }
             });
         }
-
-        frame.add(base);
-        frame.pack();
-        frame.setVisible(true);
-        this.fields = List.copyOf(tmpFields);
+        return tmpFields;
     }
 
     private void redraw() {
         SwingUtilities.invokeLater(() -> controller.draw(this));
     }
 
+    public void displayDies(List<Integer> dies) {
+        diebox.removeAll();
+        for (int eyes :
+          dies) {
+            var rnd = new Random();
+            var x = rnd.nextInt(diebox.getWidth() - 60);
+            var y = rnd.nextInt(diebox.getHeight() - 60);
+            var die = dieFactory
+                .setEyes(eyes)
+                .setRotation(rnd.nextFloat(2))
+                .create();
+            die.setBounds(x, y, 60, 60);
+            diebox.add(die);
+        }
+        diebox.revalidate();
+        diebox.repaint();
+    }
 
-    public static Factory make(Attributes attributes) {
+
+    public static Factory make(Attributes attributes) throws IOException {
         return new Factory(attributes);
     }
 
     public static Factory make() {
-        return make(Attributes.def());
+        try {
+            return make(Attributes.def());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void setFieldTokens(int i, List<Token> tokens) {
@@ -89,10 +150,10 @@ public class Board {
 
     @SuppressWarnings({"UnusedReturnValue", "unused"})
     public static class Factory {
-        private final Attributes attrs;
 
         private Dimension dimensions;
 
+        private final Die.Factory dieFactory;
 
         private Color background;
         private ArrayList<Field.Factory> fields = new ArrayList<>();
@@ -100,10 +161,10 @@ public class Board {
         private BoardLayout layout = new EdgeLayout();
         private GameController controller;
 
-        public Factory(Attributes attrs) {
-            this.attrs = attrs;
+        public Factory(Attributes attrs) throws IOException {
             dimensions = attrs.getWindowDimensions();
             background = attrs.getBoardColor();
+            dieFactory = Die.from("Dice.png");
         }
 
 

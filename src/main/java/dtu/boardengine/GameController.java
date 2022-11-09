@@ -8,7 +8,13 @@ public abstract class GameController {
 
     public abstract void draw(Board board);
 
-    public abstract void clickField(Field field);
+    public void clickField(Field field) {
+        // does nothing override to handle event.
+    }
+
+    public void clickInfoBox(Board board) {
+        // does nothing override to handle event.
+    }
 
     public void runGame() {
         // Needed to make the swing application perform correctly
@@ -18,4 +24,5 @@ public abstract class GameController {
             draw(board);
         });
     }
+
 }

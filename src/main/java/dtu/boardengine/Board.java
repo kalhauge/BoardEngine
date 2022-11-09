@@ -28,7 +28,6 @@ public class Board {
 
         this.dieFactory = factory.dieFactory;
 
-        // private final BoardCenter center;
         JFrame frame = new JFrame();
         frame.setLocationByPlatform(true);
         frame.setLocationRelativeTo(null);
@@ -36,6 +35,7 @@ public class Board {
 
         var base = new JLayeredPane();
         base.setPreferredSize(factory.dimensions);
+        base.setSize(factory.dimensions);
         base.setLayout(null);
         base.setBackground(factory.background);
         base.setOpaque(true);
@@ -43,7 +43,7 @@ public class Board {
 
         var infobox = new JLayeredPane();
         infobox.setOpaque(true);
-        infobox.setBackground(Color.green);
+        infobox.setLayout(null);
 
         var board = this;
         infobox.addMouseListener(new ClickListener() {
@@ -55,27 +55,19 @@ public class Board {
         });
         base.add(infobox);
 
-        diebox = new JLayeredPane();
-        diebox.setOpaque(true);
-        diebox.setLayout(null);
-        diebox.setBackground(Color.blue);
-        base.add(diebox);
-        base.setLayer(diebox, JLayeredPane.PALETTE_LAYER);
-        diebox.addMouseListener(new ClickListener() {
-            @Override
-            public void onClick() {
-                controller.clickInfoBox(board);
-                redraw();
-            }
-        });
+        this.fields = setupFields(factory, infobox, base);
 
-        this.fields = setupFields(factory, diebox, base);
+        diebox = new JLayeredPane();
+        diebox.setLayout(null);
+        diebox.setBounds(0, 0, infobox.getWidth(), infobox.getHeight());
+        infobox.add(diebox);
+        infobox.setLayer(diebox, JLayeredPane.POPUP_LAYER);
 
         frame.pack();
         frame.setVisible(true);
     }
 
-    private ArrayList<Field> setupFields (Factory factory, JLayeredPane infobox, JLayeredPane base) {
+    private ArrayList<Field> setupFields(Factory factory, JLayeredPane infobox, JLayeredPane base) {
         var tmpFields = new ArrayList<Field>();
         var panes = new ArrayList<JComponent>();
         for (Field.Factory ignored : factory.fields) {
@@ -87,7 +79,7 @@ public class Board {
 
         factory.layout.layoutBoard(panes, infobox, factory.dimensions);
 
-        for (int i = 0; i < factory.fields.size(); i ++ ) {
+        for (int i = 0; i < factory.fields.size(); i++) {
             var f = factory.fields.get(i);
             var p = (JLayeredPane) panes.get(i);
             Field field = f.attach(this, i, p);
@@ -109,15 +101,13 @@ public class Board {
 
     public void displayDies(List<Integer> dies) {
         diebox.removeAll();
-        for (int eyes :
-          dies) {
+        for (int eyes : dies) {
             var rnd = new Random();
             var x = rnd.nextInt(diebox.getWidth() - 60);
             var y = rnd.nextInt(diebox.getHeight() - 60);
-            var die = dieFactory
-                .setEyes(eyes)
-                .setRotation(rnd.nextFloat(2))
-                .create();
+            var die = dieFactory.setEyes(eyes)
+              .setRotation(rnd.nextFloat(2))
+              .create();
             die.setBounds(x, y, 60, 60);
             diebox.add(die);
         }
@@ -139,12 +129,13 @@ public class Board {
     }
 
     public void setFieldTokens(int i, List<Token> tokens) {
-        fields.get(i).setTokens(tokens);
+        fields.get(i)
+          .setTokens(tokens);
     }
 
     public void clear() {
-        for (Field f: fields) {
-           f.setTokens(List.of());
+        for (Field f : fields) {
+            f.setTokens(List.of());
         }
     }
 
@@ -157,7 +148,6 @@ public class Board {
 
         private Color background;
         private ArrayList<Field.Factory> fields = new ArrayList<>();
-        // private BoardCenter center;
         private BoardLayout layout = new EdgeLayout();
         private GameController controller;
 

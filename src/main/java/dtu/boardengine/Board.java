@@ -2,8 +2,12 @@ package dtu.boardengine;
 
 import dtu.boardengine.layout.BoardLayout;
 import dtu.boardengine.layout.EdgeLayout;
+import dtu.boardengine.util.ClickListener;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +19,7 @@ public class Board {
 
     // private final BoardCenter center;
     private final JFrame frame;
+
 
     private Board(Factory factory) {
         // this.center = factory.center;
@@ -43,7 +48,14 @@ public class Board {
         for (int i = 0; i < factory.fields.size(); i ++ ) {
             var f = factory.fields.get(i);
             var p = (JLayeredPane) panes.get(i);
-            tmpFields.add(f.attach(p));
+            Field field = f.attach(this, i, p);
+            tmpFields.add(field);
+            p.addMouseListener(new ClickListener() {
+                @Override
+                public void onClick() {
+                    factory.eventHandler.clickField(field);
+                }
+            });
         }
 
         frame.add(base);
@@ -57,18 +69,36 @@ public class Board {
         return new Factory(attributes);
     }
 
+    public static Factory make() {
+        return new Factory(Attributes.def());
+    }
+
     public void setFieldTokens(int i, List<Token> tokens) {
         fields.get(i).setTokens(tokens);
     }
 
+    public void clear() {
+        for (Field f: fields) {
+           f.setTokens(List.of());
+        }
+    }
+
     public static class Factory {
         private final Attributes attrs;
+
+        private Dimension dimensions;
+
+
+        private Color background;
         private ArrayList<Field.Factory> fields = new ArrayList<>();
         private BoardCenter center;
         private BoardLayout layout = new EdgeLayout();
+        private EventHandler eventHandler;
 
         public Factory(Attributes attrs) {
             this.attrs = attrs;
+            dimensions = attrs.getWindowDimensions();
+            background = attrs.getBoardColor();
         }
 
         public Factory addField(Field.Factory field) {
@@ -79,6 +109,18 @@ public class Board {
         @SuppressWarnings("unused")
         private Factory setFields(ArrayList<Field.Factory> fields) {
             this.fields = fields;
+            return this;
+        }
+
+        @SuppressWarnings("unused")
+        public Factory setDimensions(Dimension dimensions) {
+            this.dimensions = dimensions;
+            return this;
+        }
+
+        @SuppressWarnings("unused")
+        public Factory setBackground(Color background) {
+            this.background = background;
             return this;
         }
 
@@ -98,6 +140,13 @@ public class Board {
             return new Board(this);
         }
 
+        public void setEventHandler(EventHandler eventHandler) {
+            this.eventHandler = eventHandler;
+        }
+
+        public EventHandler getEventHandler() {
+            return eventHandler;
+        }
     }
 
 

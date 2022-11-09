@@ -1,51 +1,63 @@
 package dtu.matador;
 
-import dtu.boardengine.Attributes;
-import dtu.boardengine.Board;
-import dtu.boardengine.Field;
-import dtu.boardengine.Token;
+import dtu.boardengine.*;
 
 import javax.swing.*;
-import java.awt.*;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
+import java.awt.Color;
+import java.util.ArrayList;
 import java.util.List;
 
-public class Main {
 
-    public static void main(String[] args) throws InterruptedException, InvocationTargetException {
-        Attributes attr = new Attributes();
-        SwingUtilities.invokeAndWait(() -> {
-            Board board = Board.make(attr)
-              .addField(Field.make()
-                          .setBackground(Color.blue)
-                          .setForeground(Color.white)
-                          .setTitle("Start")
+public class Main extends GameController {
+    private final List<Integer> hotelCount;
+
+    public Main() {
+        hotelCount = new ArrayList<>();
+        for (int i = 0; i < 24; i++) {
+            hotelCount.add(0);
+        }
+
+    }
+
+    public Board.Factory setup() {
+        Board.Factory bf = Board.make();
+
+        for (Integer _i : hotelCount) {
+            bf.addField(Field.make()
+                          .setTitle("Field")
                           .setSubtitle("")
-                          .setDescription(""))
-              .addField(Field.make()
-                          .setForeground(Color.white)
-                          .setBackground(Color.darkGray))
-              .addField(Field.make())
-              .addField(Field.make())
-              .addField(Field.make())
-              .addField(Field.make())
-              .addField(Field.make())
-              .addField(Field.make())
-              .addField(Field.make())
-              .addField(Field.make())
-              .addField(Field.make())
-              .addField(Field.make())
-              .done();
+                          .setDescription("")
+                          .setBackground(Color.darkGray)
+                          .setForeground(Color.white));
+        }
+        return bf;
+    }
 
-            URL url = Token.class.getClassLoader()
-              .getResource("Hotel.png");
-            assert url != null;
-            Token hotelToken = new Token(new ImageIcon(url));
-            board.setFieldTokens(0, List.of(hotelToken, hotelToken));
-            board.setFieldTokens(1, List.of(hotelToken, hotelToken, hotelToken, hotelToken));
+    @Override
+    public void draw(Board board) {
+        board.clear();
+        Token hotel = Token.from("Hotel.png");
+        for (int i = 0; i < hotelCount.size(); i++) {
+            ArrayList<Token> tokens = new ArrayList<>();
+            for (int j = 0; j < hotelCount.get(i); j++) {
+                tokens.add(hotel);
+            }
+            board.setFieldTokens(i, tokens);
+        }
+    }
+
+    @Override
+    public void clickField(Field field) {
+        System.out.println("Printed: " + field);
+        var fid = field.getId();
+        hotelCount.set(fid, hotelCount.get(fid) + 1);
+        SwingUtilities.invokeLater(() -> {
+            this.draw(field.getBoard());
         });
+    }
 
 
+    public static void main(String[] args) {
+        new Main().runGame();
     }
 }

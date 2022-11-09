@@ -16,8 +16,8 @@ public class Attributes {
         this(ResourceBundle.getBundle(name));
     }
 
-    public Attributes() {
-        this("default");
+    public static Attributes def() {
+        return new Attributes("default");
     }
 
     public Dimension getWindowDimensions() {

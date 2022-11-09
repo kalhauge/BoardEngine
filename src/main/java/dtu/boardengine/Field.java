@@ -9,16 +9,28 @@ import java.util.List;
  */
 public class Field {
     private final JLayeredPane pane;
+    private final JLayeredPane tokens;
 
     private Field(Factory factory, JLayeredPane pane) {
         this.pane = pane;
-        pane.setOpaque(true);
-        pane.add(factory.makeLabel(factory.title));
-        pane.add(factory.makeLabel(factory.subtitle));
-        pane.add(factory.makeLabel(factory.description));
-        pane.setLayout(new GridLayout(3, 1));
+        pane.setLayout(null);
         pane.setBackground(factory.background);
-        pane.setForeground(factory.foreground);
+        pane.setOpaque(true);
+
+        var labels = new JLayeredPane();
+        pane.add(labels);
+        labels.setBounds(0, 0, pane.getWidth(), pane.getHeight());
+        labels.add(factory.makeLabel(factory.title));
+        labels.add(factory.makeLabel(factory.subtitle));
+        labels.add(factory.makeLabel(factory.description));
+        labels.setLayout(new GridLayout(3, 1));
+
+        this.tokens = new JLayeredPane();
+        pane.add(tokens);
+        tokens.setLayout(new GridBagLayout());
+        tokens.setBounds(0, 0, pane.getWidth(), pane.getHeight());
+        pane.setLayer(this.tokens, JLayeredPane.PALETTE_LAYER);
+
     }
 
 
@@ -30,7 +42,7 @@ public class Field {
         for (Token t : tokens) {
             JLabel label = new JLabel();
             label.setIcon(t.getIcon());
-            this.pane.add(label);
+            this.tokens.add(label);
         }
     }
 

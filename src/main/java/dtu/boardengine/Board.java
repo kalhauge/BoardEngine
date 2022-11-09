@@ -37,10 +37,14 @@ public class Board {
             var pane = new JLayeredPane();
             pane.setOpaque(true);
             base.add(pane);
-            tmpFields.add(f.attach(pane));
             panes.add(pane);
         }
         factory.layout.layoutFields(panes, dimensions);
+        for (int i = 0; i < factory.fields.size(); i ++ ) {
+            var f = factory.fields.get(i);
+            var p = (JLayeredPane) panes.get(i);
+            tmpFields.add(f.attach(p));
+        }
 
         frame.add(base);
         frame.pack();

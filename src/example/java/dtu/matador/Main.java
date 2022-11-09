@@ -43,6 +43,7 @@ public class Main {
             assert url != null;
             Token hotelToken = new Token(new ImageIcon(url));
             board.setFieldTokens(0, List.of(hotelToken, hotelToken));
+            board.setFieldTokens(1, List.of(hotelToken, hotelToken, hotelToken, hotelToken));
         });
 
 

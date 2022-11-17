@@ -20,7 +20,7 @@ public class Token {
         this.icon = icon;
     }
 
-    public static Token from(String s) {
+    public static @NotNull Token from(String s) {
         URL url = Token.class.getClassLoader().getResource(s);
         if (url == null) {
             throw new InvalidParameterException("The resource is not found: " + s);
@@ -28,7 +28,7 @@ public class Token {
         return from(new ImageIcon(url));
     }
 
-    public static Token from(String s, Rectangle dims) {
+    public static @NotNull Token from(String s, @NotNull Rectangle dims) {
         URL url = Token.class.getClassLoader().getResource(s);
         if (url == null) {
             throw new InvalidParameterException("The resource is not found: " + s);
@@ -42,7 +42,7 @@ public class Token {
         }
     }
 
-    public static Token from(ImageIcon i) {
+    public static @NotNull Token from(@NotNull ImageIcon i) {
         return new Token(i);
     }
 

@@ -1,6 +1,7 @@
 package dtu.matador;
 
 import dtu.boardengine.*;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -9,9 +10,9 @@ import java.util.Random;
 
 
 public class Main extends GameController {
-    private final List<Integer> houseCount;
+    private final @NotNull List<Integer> houseCount;
     private int carPosition;
-    private final Random rnd;
+    private final @NotNull Random rnd;
 
     public Main() {
         houseCount = new ArrayList<>();
@@ -22,7 +23,7 @@ public class Main extends GameController {
 
     }
 
-    public Board.Factory setup() {
+    public Board.@NotNull Factory setup() {
         Board.Factory bf = Board.make();
 
         for (Integer ignored : houseCount) {
@@ -37,7 +38,7 @@ public class Main extends GameController {
     }
 
     @Override
-    public void draw(Board board) {
+    public void draw(@NotNull Board board) {
         board.clear();
         Token hotel = Token.from("Hotel.png");
         Token house = Token.from("House.png");
@@ -63,13 +64,13 @@ public class Main extends GameController {
     }
 
     @Override
-    public void clickField(Field field) {
+    public void clickField(@NotNull Field field) {
         var fid = field.getId();
         System.out.println(houseCount.get(fid));
         houseCount.set(fid, (houseCount.get(fid) + 1));
     }
 
-    public void clickInfoBox(Board board) {
+    public void clickInfoBox(@NotNull Board board) {
         // reset house count
         for (int i = 0; i < houseCount.size(); i++) {
             houseCount.set(i, 0);

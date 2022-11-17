@@ -1,18 +1,20 @@
 package dtu.boardengine;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.swing.*;
 
 public abstract class GameController {
 
-    public abstract Board.Factory setup();
+    public abstract Board.@NotNull Factory setup();
 
-    public abstract void draw(Board board);
+    public abstract void draw(@NotNull Board board);
 
-    public void clickField(Field field) {
+    public void clickField(@NotNull Field field) {
         // does nothing override to handle event.
     }
 
-    public void clickInfoBox(Board board) {
+    public void clickInfoBox(@NotNull Board board) {
         // does nothing override to handle event.
     }
 

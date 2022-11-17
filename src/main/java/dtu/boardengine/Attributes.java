@@ -12,24 +12,24 @@ public class Attributes {
         this.bundle = bundle;
     }
 
-    public Attributes(String name) {
+    public Attributes(@NotNull String name) {
         this(ResourceBundle.getBundle(name));
     }
 
-    public static Attributes def() {
+    public static @NotNull Attributes def() {
         return new Attributes("default");
     }
 
-    public Dimension getWindowDimensions() {
+    public @NotNull Dimension getWindowDimensions() {
         int size = Integer.parseInt(bundle.getString("Window.Size"));
         return new Dimension(size, size);
     }
 
-    public Color getColor(String key) {
+    public @NotNull Color getColor(@NotNull String key) {
         return Color.decode(bundle.getString(key));
     }
 
-    public Color getBoardColor() {
+    public @NotNull Color getBoardColor() {
         return getColor("Board.Color");
     }
 

@@ -3,6 +3,7 @@ package dtu.boardengine;
 import dtu.boardengine.layout.BoardLayout;
 import dtu.boardengine.layout.EdgeLayout;
 import dtu.boardengine.util.ClickListener;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,14 +16,14 @@ import java.util.Random;
  *
  */
 public class Board {
-    private final List<Field> fields;
+    private final @NotNull List<Field> fields;
 
-    private final GameController controller;
-    private final Die.Factory dieFactory;
-    private final JLayeredPane diebox;
+    private final @NotNull GameController controller;
+    private final Die.@NotNull Factory dieFactory;
+    private final @NotNull JLayeredPane dieBox;
 
 
-    private Board(Factory factory, GameController controller) {
+    private Board(@NotNull Factory factory, @NotNull GameController controller) {
         // this.center = factory.center;
         this.controller = controller;
 
@@ -57,17 +58,17 @@ public class Board {
 
         this.fields = setupFields(factory, infobox, base);
 
-        diebox = new JLayeredPane();
-        diebox.setLayout(null);
-        diebox.setBounds(0, 0, infobox.getWidth(), infobox.getHeight());
-        infobox.add(diebox);
-        infobox.setLayer(diebox, JLayeredPane.POPUP_LAYER);
+        dieBox = new JLayeredPane();
+        dieBox.setLayout(null);
+        dieBox.setBounds(0, 0, infobox.getWidth(), infobox.getHeight());
+        infobox.add(dieBox);
+        infobox.setLayer(dieBox, JLayeredPane.POPUP_LAYER);
 
         frame.pack();
         frame.setVisible(true);
     }
 
-    private ArrayList<Field> setupFields(Factory factory, JLayeredPane infobox, JLayeredPane base) {
+    private @NotNull ArrayList<Field> setupFields(@NotNull Factory factory, JLayeredPane infobox, @NotNull JLayeredPane base) {
         var tmpFields = new ArrayList<Field>();
         var panes = new ArrayList<JComponent>();
         for (Field.Factory ignored : factory.fields) {
@@ -99,28 +100,28 @@ public class Board {
         SwingUtilities.invokeLater(() -> controller.draw(this));
     }
 
-    public void displayDies(List<Integer> dies) {
-        diebox.removeAll();
+    public void displayDies(@NotNull List<Integer> dies) {
+        dieBox.removeAll();
         for (int eyes : dies) {
             var rnd = new Random();
-            var x = rnd.nextInt(diebox.getWidth() - 60);
-            var y = rnd.nextInt(diebox.getHeight() - 60);
+            var x = rnd.nextInt(dieBox.getWidth() - 60);
+            var y = rnd.nextInt(dieBox.getHeight() - 60);
             var die = dieFactory.setEyes(eyes)
               .setRotation(rnd.nextFloat(2))
               .create();
             die.setBounds(x, y, 60, 60);
-            diebox.add(die);
+            dieBox.add(die);
         }
-        diebox.revalidate();
-        diebox.repaint();
+        dieBox.revalidate();
+        dieBox.repaint();
     }
 
 
-    public static Factory make(Attributes attributes) throws IOException {
+    public static @NotNull Factory make(@NotNull Attributes attributes) throws IOException {
         return new Factory(attributes);
     }
 
-    public static Factory make() {
+    public static @NotNull Factory make() {
         try {
             return make(Attributes.def());
         } catch (IOException e) {
@@ -128,7 +129,7 @@ public class Board {
         }
     }
 
-    public void setFieldTokens(int i, List<Token> tokens) {
+    public void setFieldTokens(int i, @NotNull List<Token> tokens) {
         fields.get(i)
           .setTokens(tokens);
     }
@@ -142,48 +143,47 @@ public class Board {
     @SuppressWarnings({"UnusedReturnValue", "unused"})
     public static class Factory {
 
-        private Dimension dimensions;
+        private @NotNull Dimension dimensions;
 
-        private final Die.Factory dieFactory;
+        private final Die.@NotNull Factory dieFactory;
 
-        private Color background;
-        private ArrayList<Field.Factory> fields = new ArrayList<>();
-        private BoardLayout layout = new EdgeLayout();
-        private GameController controller;
+        private @NotNull Color background;
+        private @NotNull ArrayList<Field.Factory> fields = new ArrayList<>();
+        private @NotNull BoardLayout layout = new EdgeLayout();
 
-        public Factory(Attributes attrs) throws IOException {
+        public Factory(@NotNull Attributes attrs) throws IOException {
             dimensions = attrs.getWindowDimensions();
             background = attrs.getBoardColor();
             dieFactory = Die.from("Dice.png");
         }
 
 
-        public Factory addField(Field.Factory field) {
+        public @NotNull Factory addField(@NotNull Field.Factory field) {
             fields.add(field);
             return this;
         }
 
-        private Factory setFields(ArrayList<Field.Factory> fields) {
+        private @NotNull Factory setFields(@NotNull ArrayList<Field.Factory> fields) {
             this.fields = fields;
             return this;
         }
 
-        public Factory setDimensions(Dimension dimensions) {
+        public @NotNull Factory setDimensions(@NotNull Dimension dimensions) {
             this.dimensions = dimensions;
             return this;
         }
 
-        public Factory setBackground(Color background) {
+        public @NotNull Factory setBackground(@NotNull Color background) {
             this.background = background;
             return this;
         }
 
-        private Factory setLayout(BoardLayout layout) {
+        private @NotNull Factory setLayout(@NotNull BoardLayout layout) {
             this.layout = layout;
             return this;
         }
 
-        public Board done(GameController controller) {
+        public @NotNull Board done(@NotNull GameController controller) {
             return new Board(this, controller);
         }
     }

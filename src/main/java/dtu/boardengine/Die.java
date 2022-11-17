@@ -1,5 +1,7 @@
 package dtu.boardengine;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -10,7 +12,7 @@ import java.net.URL;
 public class Die extends JLabel {
     private final float rotation;
 
-    public Die(Factory factory) {
+    public Die(@NotNull Factory factory) {
         rotation = factory.rotation;
         setIcon(factory.getIcon());
     }
@@ -24,7 +26,7 @@ public class Die extends JLabel {
         super.paintComponent(g);
     }
 
-    public static Die.Factory from(String file) throws IOException {
+    public static Die.@NotNull Factory from(String file) throws IOException {
         URL path = Die.class.getClassLoader().getResource(file);
         assert path != null;
         BufferedImage image = ImageIO.read(path);
@@ -46,17 +48,17 @@ public class Die extends JLabel {
             this.icons = icons;
         }
 
-        public Factory setRotation(float rotation) {
+        public @NotNull Factory setRotation(float rotation) {
             this.rotation = rotation;
             return this;
         }
 
-        public Factory setEyes(int eyes) {
+        public @NotNull Factory setEyes(int eyes) {
             this.eyes = eyes;
             return this;
         }
 
-        public Die create() {
+        public @NotNull Die create() {
            return new Die(this);
         }
         private ImageIcon getIcon() {

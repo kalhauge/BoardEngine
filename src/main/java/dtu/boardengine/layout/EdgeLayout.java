@@ -1,5 +1,7 @@
 package dtu.boardengine.layout;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
@@ -8,7 +10,7 @@ public class EdgeLayout implements BoardLayout {
 
 
     @Override
-    public void layoutBoard(List<JComponent> components, JComponent infobox, Dimension dims) {
+    public void layoutBoard(@NotNull List<JComponent> components, @NotNull JComponent infobox, @NotNull Dimension dims) {
         int fieldsPerSide = Math.max(Math.ceilDiv(components.size(), 4), 2);
         float fieldSizeX = (float) dims.width / ((float) fieldsPerSide + 1);
         float fieldSizeY = (float) dims.height / ((float) fieldsPerSide + 1);

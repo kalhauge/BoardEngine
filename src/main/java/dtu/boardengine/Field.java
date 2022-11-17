@@ -1,5 +1,7 @@
 package dtu.boardengine;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
@@ -11,9 +13,9 @@ import java.util.List;
 public class Field {
     private final Board board;
     private final int id;
-    private final JLayeredPane tokens;
+    private final @NotNull JLayeredPane tokens;
 
-    private Field(Factory factory, Board board, int id, JLayeredPane pane) {
+    private Field(@NotNull Factory factory, Board board, int id, @NotNull JLayeredPane pane) {
         this.board = board;
         this.id = id;
         pane.setLayout(null);
@@ -50,7 +52,7 @@ public class Field {
     }
 
 
-    public static Factory make() {
+    public static @NotNull Factory make() {
         return new Factory();
     }
 
@@ -59,7 +61,7 @@ public class Field {
      *
      * @param tokens a list of tokens to draw
      */
-    public void setTokens(List<Token> tokens) {
+    public void setTokens(@NotNull List<Token> tokens) {
         this.tokens.removeAll();
         for (Token t : tokens) {
             JLabel label = new JLabel();
@@ -82,32 +84,32 @@ public class Field {
         private Factory() {
         }
 
-        public Factory setTitle(String title) {
+        public @NotNull Factory setTitle(String title) {
             this.title = title;
             return this;
         }
 
-        public Factory setSubtitle(String subtitle) {
+        public @NotNull Factory setSubtitle(String subtitle) {
             this.subtitle = subtitle;
             return this;
         }
 
-        public Factory setDescription(String description) {
+        public @NotNull Factory setDescription(String description) {
             this.description = description;
             return this;
         }
 
-        public Factory setForeground(Color foreground) {
+        public @NotNull Factory setForeground(Color foreground) {
             this.foreground = foreground;
             return this;
         }
 
-        public Factory setTokenMargin(int tokenMargin) {
+        public @NotNull Factory setTokenMargin(int tokenMargin) {
             this.tokenMargin = tokenMargin;
             return this;
         }
 
-        private JLabel makeLabel(String string) {
+        private @NotNull JLabel makeLabel(String string) {
             var label = new JLabel();
             label.setText(string);
             label.setForeground(foreground);
@@ -118,12 +120,12 @@ public class Field {
             return label;
         }
 
-        public Factory setBackground(Color background) {
+        public @NotNull Factory setBackground(Color background) {
             this.background = background;
             return this;
         }
 
-        public Field attach(Board board, int id, JLayeredPane pane) {
+        public @NotNull Field attach(Board board, int id, @NotNull JLayeredPane pane) {
             return new Field(this, board, id, pane);
         }
     }

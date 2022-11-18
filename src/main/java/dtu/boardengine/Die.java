@@ -1,5 +1,6 @@
 package dtu.boardengine;
 
+import dtu.boardengine.util.RotateLabel;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
@@ -9,21 +10,16 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 
-public class Die extends JLabel {
-    private final float rotation;
+public class Die {
 
-    public Die(@NotNull Factory factory) {
-        rotation = factory.rotation;
-        setIcon(factory.getIcon());
-    }
+    private final @NotNull Board board;
+    private final @NotNull RotateLabel label;
+    private final int eyes;
 
-    @Override
-    protected void paintComponent(Graphics g) {
-        Graphics2D g2 = (Graphics2D) g;
-        var icon = this.getIcon();
-        assert icon != null;
-        g2.rotate(this.rotation, (float) icon.getIconWidth() / 2, (float) icon.getIconHeight() / 2);
-        super.paintComponent(g);
+    public Die(@NotNull Board board, @NotNull Factory factory) {
+        this.eyes = factory.eyes;
+        this.board = board;
+        this.label = factory.makeLabel();
     }
 
     public static Die.@NotNull Factory from(String file) throws IOException {
@@ -39,10 +35,31 @@ public class Die extends JLabel {
         return new Die.Factory(icons);
     }
 
+    public int getEyes() {
+        return eyes;
+    }
+
+    public Component getLabel() {
+        return label;
+    }
+
+    public void setVisible(boolean bool) {
+        label.setVisible(bool);
+        label.revalidate();
+        label.repaint();
+    }
+
+    @SuppressWarnings("unused")
+    public @NotNull Board getBoard() {
+        return board;
+    }
+
     public static class Factory{
-        private final ImageIcon[] icons;
+        private final @NotNull ImageIcon[] icons;
         private float rotation;
         private int eyes;
+        private int x;
+        private int y;
 
         public Factory(ImageIcon[] icons) {
             this.icons = icons;
@@ -58,11 +75,24 @@ public class Die extends JLabel {
             return this;
         }
 
-        public @NotNull Die create() {
-           return new Die(this);
+        public @NotNull Die create(@NotNull Board board) {
+           return new Die(board, this);
         }
         private ImageIcon getIcon() {
             return icons[eyes - 1];
+        }
+
+        public Factory setPosition(int x, int y) {
+            this.x = x;
+            this.y = y;
+            return this;
+        }
+
+        public RotateLabel makeLabel() {
+            var label = new RotateLabel(this.rotation);
+            label.setBounds(x, y, 60, 60);
+            label.setIcon(getIcon());
+            return label;
         }
     }
 }

@@ -18,6 +18,10 @@ public abstract class GameController {
         // does nothing override to handle event.
     }
 
+    public void clickDie(@NotNull Die die) {
+        // does nothing override to handle event.
+    }
+
     public void runGame() {
         // Needed to make the swing application perform correctly
         SwingUtilities.invokeLater(() -> {

@@ -102,15 +102,23 @@ public class Board {
 
     public void displayDies(@NotNull List<Integer> dies) {
         dieBox.removeAll();
+        var rnd = new Random();
         for (int eyes : dies) {
-            var rnd = new Random();
             var x = rnd.nextInt(dieBox.getWidth() - 60);
             var y = rnd.nextInt(dieBox.getHeight() - 60);
             var die = dieFactory.setEyes(eyes)
               .setRotation(rnd.nextFloat(2))
-              .create();
-            die.setBounds(x, y, 60, 60);
-            dieBox.add(die);
+              .setPosition(x, y)
+              .create(this);
+            var label = die.getLabel();
+            label.addMouseListener(new ClickListener() {
+                @Override
+                public void onClick() {
+                    controller.clickDie(die);
+                    redraw();
+                }
+            });
+            dieBox.add(label);
         }
         dieBox.revalidate();
         dieBox.repaint();

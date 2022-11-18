@@ -12,6 +12,7 @@ import java.util.Random;
 public class Main extends GameController {
     private final @NotNull List<Integer> houseCount;
     private int carPosition;
+    private int activeDie = 0;
     private final @NotNull Random rnd;
 
     public Main() {
@@ -58,7 +59,6 @@ public class Main extends GameController {
             if (i == carPosition) {
                 tokens.add(car);
             }
-            System.out.println(i +  ": " + tokens.size());
             board.setFieldTokens(i, tokens);
         }
     }
@@ -66,7 +66,6 @@ public class Main extends GameController {
     @Override
     public void clickField(@NotNull Field field) {
         var fid = field.getId();
-        System.out.println(houseCount.get(fid));
         houseCount.set(fid, (houseCount.get(fid) + 1));
     }
 
@@ -75,13 +74,23 @@ public class Main extends GameController {
         for (int i = 0; i < houseCount.size(); i++) {
             houseCount.set(i, 0);
         }
-        var fst = rnd.nextInt(6) + 1;
-        var snd = rnd.nextInt(6) + 1;
 
-        carPosition = (carPosition + fst + snd) % houseCount.size();
-        board.displayDies(List.of(fst, snd));
+        // if there are no active die, reroll
+        if (activeDie == 0) {
+            var fst = rnd.nextInt(6) + 1;
+            var snd = rnd.nextInt(6) + 1;
+
+            board.displayDies(List.of(fst, snd));
+            activeDie = 2;
+        }
     }
 
+    @Override
+    public void clickDie(@NotNull Die die) {
+        activeDie -= 1;
+        carPosition = (carPosition + die.getEyes()) % houseCount.size();
+        die.setVisible(false);
+    }
 
     public static void main(String[] args) {
         new Main().runGame();

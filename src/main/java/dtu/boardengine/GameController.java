@@ -8,7 +8,10 @@ public abstract class GameController {
 
     public abstract Board.@NotNull Factory setup();
 
+    public abstract void onStart(@NotNull Board board);
+
     public abstract void draw(@NotNull Board board);
+
 
     public void clickField(@NotNull Field field) {
         // does nothing override to handle event.
@@ -27,6 +30,7 @@ public abstract class GameController {
         SwingUtilities.invokeLater(() -> {
             Board.Factory bf = setup();
             Board board = bf.done(this);
+            this.onStart(board);
             draw(board);
         });
     }

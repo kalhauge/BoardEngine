@@ -8,9 +8,9 @@ The primary goal is to separate the drawing and the running the game.
 
 ## Missing
 
-* [ ] A good way to display the stats of the players 
-* [ ] A good way to get non-click inputs from the player.
-* [ ] Proper documentations.
+* [ ] A way to display cropped icons. Current work around is to create multiple sprites.
+* [ ] Factor out swing.
+* [ ] Proper documentation.
 
 Reach goals:
 

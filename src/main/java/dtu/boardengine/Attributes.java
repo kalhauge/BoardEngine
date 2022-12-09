@@ -33,6 +33,7 @@ public class Attributes {
         return getColor("Board.Color");
     }
 
-
-
+    public @NotNull Color getForegroundColor() {
+        return  getColor("Foreground.Color");
+    }
 }

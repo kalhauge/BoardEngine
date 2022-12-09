@@ -1,9 +1,11 @@
 package dtu.matador;
 
 import dtu.boardengine.*;
+import dtu.boardengine.util.HtmlBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -11,9 +13,10 @@ import java.util.Random;
 
 public class Main extends GameController {
     private final @NotNull List<Integer> houseCount;
-    private int carPosition;
-    private int activeDie = 0;
     private final @NotNull Random rnd;
+    private int carPosition;
+    private String player_name;
+    private int activeDie = 0;
 
     public Main() {
         houseCount = new ArrayList<>();
@@ -22,6 +25,10 @@ public class Main extends GameController {
             houseCount.add(0);
         }
 
+    }
+
+    public static void main(String[] args) {
+        new Main().runGame();
     }
 
     public Board.@NotNull Factory setup() {
@@ -36,6 +43,14 @@ public class Main extends GameController {
                           .setForeground(Color.white));
         }
         return bf;
+    }
+
+    public void onStart(@NotNull Board board) {
+       player_name = board.askTextInput(
+         "Player 1:",
+         "Name your player!",
+         "Your player needs a name!"
+       );
     }
 
     @Override
@@ -61,6 +76,14 @@ public class Main extends GameController {
             }
             board.setFieldTokens(i, tokens);
         }
+        URL url = Token.class.getClassLoader().getResource("Cars.png");
+        board.setInfo(
+          HtmlBuilder.make()
+            .b("The Current Score is:")
+            .ul(List.of(
+                html -> html.img(url).text(player_name).text(": " + carPosition)
+            )).toHTML()
+        );
     }
 
     @Override
@@ -90,9 +113,5 @@ public class Main extends GameController {
         activeDie -= 1;
         carPosition = (carPosition + die.getEyes()) % houseCount.size();
         die.setVisible(false);
-    }
-
-    public static void main(String[] args) {
-        new Main().runGame();
     }
 }
